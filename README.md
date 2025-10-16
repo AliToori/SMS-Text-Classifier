@@ -1,6 +1,6 @@
-# Healthcare Costs Prediction using TensorFlow Linear Regression
+# SMS Text Classifier using TensorFlow Sequential Neural Network
 
-This project implements a healthcare costs prediction system using a Linear Regression model in TensorFlow, developed as part of the freeCodeCamp Machine Learning with Python certification. The goal is to predict healthcare expenses based on features like age, sex, BMI, children, smoker status, and region, achieving a Mean Absolute Error (MAE) under $3500 on the test dataset, using the insurance dataset.
+This project implements an SMS text classification system using a Sequential Neural Network with Embedding and Dense Layers in TensorFlow, developed as part of the freeCodeCamp Machine Learning with Python certification. The goal is to classify SMS messages as either "ham" (normal messages) or "spam" (advertisements or company messages) using the SMS Spam Collection dataset.
 
 ---
 
@@ -11,25 +11,32 @@ This project implements a healthcare costs prediction system using a Linear Regr
 
 ---
 
-### Project Overview
+## Project Overview
 The project involves:
-1. Loading and preprocessing the insurance dataset, encoding categorical variables (sex, smoker, region), and normalizing numerical features.
-2. Splitting the dataset into 80% training and 20% testing sets, with the target variable (`expenses`) separated as labels.
-3. Building a Linear Regression model using TensorFlow’s `Sequential` API with a single dense layer.
-4. Training the model to minimize MAE and evaluating it to ensure MAE < 3500 on the test set.
-5. Visualizing predicted vs. actual expenses using a scatter plot.
-6. Implementing the logic in a modular, class-based Python script (`HealthcareCostsPredictor.py`) for reusability.
+1. Loading and preprocessing the SMS Spam Collection dataset, converting text messages into padded sequences and labels into binary (0 for ham, 1 for spam).
+2. Building a **Sequential Neural Network** using TensorFlow’s `Sequential` API, featuring:
+   - An **Embedding Layer** (16 dimensions) to convert tokenized words into dense vectors.
+   - A **GlobalAveragePooling1D** layer to aggregate embeddings.
+   - A **Dense Layer** with 24 units and ReLU activation for pattern learning.
+   - A **Dense Output Layer** with 1 unit and Sigmoid activation for binary classification.
+3. Training the model with binary cross-entropy loss and Adam optimizer to classify messages as "ham" or "spam" with high accuracy.
+4. Implementing a `predict_message` function that takes a message string and returns a list containing the probability of "spam" (0 to 1) and the predicted label ("ham" or "spam").
+5. Testing the model against a set of predefined messages to ensure correct classification.
+6. Providing a modular Python class (`SMSTextClassifier.py`) for reusability.
 
-Example output from the evaluation:
+Example output from the prediction function:
+```python
+[0.008318834938108921, 'ham']
+```
+
+Example test result:
 ```bash
-Testing set Mean Abs Error: 2456.78 expenses
 You passed the challenge. Great job!
 ```
-(A scatter plot shows predicted vs. actual expenses with a 1:1 reference line.)
 
 ---
 
-### [Google Colab Project Link](https://colab.research.google.com/drive/1YhqiUuH22rZCzQpfbL8msT8cHZ4J_uGR#scrollTo=Xe7RXH3N3CWU)
+## [Google Colab Project Link](https://colab.research.google.com/drive/1XF7scLFr_brcQARJEf5CiS3lxFcaSSrr#scrollTo=8RZOuS9LWQvv)
 
 ---
 
