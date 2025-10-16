@@ -1,6 +1,6 @@
-# Healthcare Costs Prediction using TensorFlow Linear Regression
+# SMS Text Classifier using TensorFlow Sequential Neural Network
 
-This project implements a healthcare costs prediction system using a Linear Regression model in TensorFlow, developed as part of the freeCodeCamp Machine Learning with Python certification. The goal is to predict healthcare expenses based on features like age, sex, BMI, children, smoker status, and region, achieving a Mean Absolute Error (MAE) under $3500 on the test dataset, using the insurance dataset.
+This project implements an SMS text classification system using a Sequential Neural Network with Embedding and Dense Layers in TensorFlow, developed as part of the freeCodeCamp Machine Learning with Python certification. The goal is to classify SMS messages as either "ham" (normal messages) or "spam" (advertisements or company messages) using the SMS Spam Collection dataset.
 
 ---
 
@@ -9,7 +9,7 @@ This project implements a healthcare costs prediction system using a Linear Regr
 💬 **Telegram**: [@AliToori](https://t.me/@AliToori)  
 📂 **GitHub**: [Github.com/AliToori](https://github.com/AliToori)
 
----
+---Z~~ZZZZZZZZZZZZZZZZZZ~~
 
 ### Project Overview
 The project involves:
