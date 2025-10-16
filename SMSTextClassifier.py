@@ -1,169 +1,111 @@
+import tensorflow as tf
 import pandas as pd
 import numpy as np
-import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import layers
-from sklearn.preprocessing import LabelEncoder, StandardScaler
-from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
-import urllib.request
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+import requests
 import os
 
-
-class HealthCostPredictor:
-    """A class to predict healthcare costs using TensorFlow Linear Regression."""
-
-    def __init__(self, data_url):
-        """Initialize with dataset URL and set up attributes."""
-        self.data_url = data_url
-        self.dataset = None
-        self.train_dataset = None
-        self.test_dataset = None
-        self.train_labels = None
-        self.test_labels = None
+class SMSTextClassifier:
+    def __init__(self, vocab_size=10000, max_length=120, embedding_dim=16):
+        self.vocab_size = vocab_size
+        self.max_length = max_length
+        self.embedding_dim = embedding_dim
+        self.trunc_type = 'post'
+        self.padding_type = 'post'
+        self.oov_tok = "<OOV>"
+        self.tokenizer = None
         self.model = None
-        self.le_sex = LabelEncoder()
-        self.le_smoker = LabelEncoder()
-        self.le_region = LabelEncoder()
-        self.scaler = StandardScaler()
+        self.train_file_path = "train-data.tsv"
+        self.test_file_path = "valid-data.tsv"
 
-    def load_data(self):
-        """Download and load the insurance dataset."""
-        local_file = 'insurance.csv'
-        try:
-            if not os.path.exists(local_file):
-                print("Downloading dataset...")
-                urllib.request.urlretrieve(self.data_url, local_file)
-            self.dataset = pd.read_csv(local_file)
-            print("Dataset Head:")
-            print(self.dataset.head())
-            print("\nDataset Info:")
-            print(self.dataset.info())
-        except Exception as e:
-            raise RuntimeError(f"Failed to load data: {e}")
+    def download_data(self):
+        """Download training and test datasets if not already present."""
+        if not os.path.exists(self.train_file_path):
+            url = "https://cdn.freecodecamp.org/project-data/sms/train-data.tsv"
+            r = requests.get(url)
+            with open(self.train_file_path, 'wb') as f:
+                f.write(r.content)
+        if not os.path.exists(self.test_file_path):
+            url = "https://cdn.freecodecamp.org/project-data/sms/valid-data.tsv"
+            r = requests.get(url)
+            with open(self.test_file_path, 'wb') as f:
+                f.write(r.content)
 
-    def preprocess_data(self):
-        """Encode categorical variables, split data, and normalize features."""
-        if self.dataset is None:
-            raise ValueError("Data not loaded. Run load_data() first.")
+    def load_and_preprocess_data(self):
+        """Load and preprocess the SMS datasets."""
+        train_data = pd.read_csv(self.train_file_path, sep='\t', header=None, names=['label', 'message'])
+        test_data = pd.read_csv(self.test_file_path, sep='\t', header=None, names=['label', 'message'])
 
-        try:
-            # Encode categorical columns
-            self.dataset['sex'] = self.le_sex.fit_transform(self.dataset['sex'])
-            self.dataset['smoker'] = self.le_smoker.fit_transform(self.dataset['smoker'])
-            self.dataset['region'] = self.le_region.fit_transform(self.dataset['region'])
+        train_data['label'] = train_data['label'].map({'ham': 0, 'spam': 1})
+        test_data['label'] = test_data['label'].map({'ham': 0, 'spam': 1})
 
-            # Separate features and target
-            self.train_dataset = self.dataset.drop('expenses', axis=1)
-            self.train_labels = self.dataset.pop('expenses')
+        self.tokenizer = Tokenizer(num_words=self.vocab_size, oov_token=self.oov_tok)
+        self.tokenizer.fit_on_texts(train_data['message'])
 
-            # Split data (80% train, 20% test)
-            self.train_dataset, self.test_dataset, self.train_labels, self.test_labels = train_test_split(
-                self.train_dataset, self.train_labels, test_size=0.2, random_state=42
-            )
+        train_sequences = self.tokenizer.texts_to_sequences(train_data['message'])
+        self.train_padded = pad_sequences(train_sequences, maxlen=self.max_length,
+                                        padding=self.padding_type, truncating=self.trunc_type)
+        test_sequences = self.tokenizer.texts_to_sequences(test_data['message'])
+        self.test_padded = pad_sequences(test_sequences, maxlen=self.max_length,
+                                        padding=self.padding_type, truncating=self.trunc_type)
 
-            # Normalize features
-            self.train_dataset = self.scaler.fit_transform(self.train_dataset)
-            self.test_dataset = self.scaler.transform(self.test_dataset)
-
-            print("Train dataset shape:", self.train_dataset.shape)
-            print("Test dataset shape:", self.test_dataset.shape)
-            print("Train labels shape:", self.train_labels.shape)
-            print("Test labels shape:", self.test_labels.shape)
-        except Exception as e:
-            raise RuntimeError(f"Failed to preprocess data: {e}")
+        self.train_labels = np.array(train_data['label'])
+        self.test_labels = np.array(test_data['label'])
 
     def build_model(self):
-        """Build and compile the TensorFlow Linear Regression model."""
-        try:
-            self.model = tf.keras.Sequential([
-                layers.Dense(units=1, input_shape=[self.train_dataset.shape[1]])
-            ])
-            self.model.compile(
-                optimizer=tf.keras.optimizers.Adam(learning_rate=0.1),
-                loss='mean_absolute_error',
-                metrics=['mae', 'mse']
-            )
-            print("Model built and compiled.")
-        except Exception as e:
-            raise RuntimeError(f"Failed to build model: {e}")
+        """Build and compile the neural network model."""
+        self.model = tf.keras.Sequential([
+            tf.keras.layers.Embedding(self.vocab_size, self.embedding_dim, input_length=self.max_length),
+            tf.keras.layers.GlobalAveragePooling1D(),
+            tf.keras.layers.Dense(24, activation='relu'),
+            tf.keras.layers.Dense(1, activation='sigmoid')
+        ])
+        self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-    def train_model(self):
-        """Train the model on the training data."""
-        if self.train_dataset is None or self.train_labels is None:
-            raise ValueError("Training data not prepared. Run preprocess_data() first.")
-        if self.model is None:
-            raise ValueError("Model not built. Run build_model() first.")
+    def train_model(self, epochs=30):
+        """Train the model on the preprocessed data."""
+        if self.model is None or self.tokenizer is None:
+            raise ValueError("Model or tokenizer not initialized. Run load_and_preprocess_data and build_model first.")
+        self.model.fit(self.train_padded, self.train_labels, epochs=epochs,
+                      validation_data=(self.test_padded, self.test_labels), verbose=2)
 
-        try:
-            history = self.model.fit(
-                self.train_dataset, self.train_labels,
-                epochs=100,
-                validation_split=0.2,
-                verbose=0
-            )
-            print("Training completed. Final training MAE:", history.history['mae'][-1])
-            return history
-        except Exception as e:
-            raise RuntimeError(f"Failed to train model: {e}")
+    def predict_message(self, pred_text):
+        """Predict whether a message is ham or spam."""
+        sequence = self.tokenizer.texts_to_sequences([pred_text])
+        padded = pad_sequences(sequence, maxlen=self.max_length,
+                              padding=self.padding_type, truncating=self.trunc_type)
+        prediction = self.model.predict(padded, verbose=0)[0][0]
+        label = 'spam' if prediction >= 0.5 else 'ham'
+        return [float(prediction), label]
 
-    def evaluate_model(self):
-        """Evaluate the model on test data and check MAE requirement."""
-        if self.test_dataset is None or self.test_labels is None:
-            raise ValueError("Test data not prepared. Run preprocess_data() first.")
-        if self.model is None:
-            raise ValueError("Model not built. Run build_model() first.")
+    def test_predictions(self):
+        """Test the model with predefined messages."""
+        test_messages = [
+            "how are you doing today",
+            "sale today! to stop texts call 98912460324",
+            "i dont want to go. can we try it a different day? available sat",
+            "our new mobile video service is live. just install on your phone to start watching.",
+            "you have won £1000 cash! call to claim your prize.",
+            "i'll bring it tomorrow. don't forget the milk.",
+            "wow, is your arm alright. that happened to me one time too"
+        ]
+        test_answers = ["ham", "spam", "ham", "spam", "spam", "ham", "ham"]
+        passed = True
 
-        try:
-            loss, mae, mse = self.model.evaluate(self.test_dataset, self.test_labels, verbose=2)
-            print("Testing set Mean Abs Error: {:5.2f} expenses".format(mae))
+        for msg, ans in zip(test_messages, test_answers):
+            prediction = self.predict_message(msg)
+            if prediction[1] != ans:
+                passed = False
+                print(f"Failed on message: {msg}, Expected: {ans}, Got: {prediction[1]}")
 
-            if mae < 3500:
-                print("You passed the challenge. Great job!")
-            else:
-                print("The Mean Abs Error must be less than 3500. Keep trying.")
-
-            return mae
-        except Exception as e:
-            raise RuntimeError(f"Failed to evaluate model: {e}")
-
-    def visualize_results(self):
-        """Visualize predicted vs actual expenses."""
-        if self.test_dataset is None or self.test_labels is None:
-            raise ValueError("Test data not prepared. Run preprocess_data() first.")
-        if self.model is None:
-            raise ValueError("Model not built. Run build_model() first.")
-
-        try:
-            test_predictions = self.model.predict(self.test_dataset).flatten()
-            plt.figure(figsize=(8, 8))
-            plt.scatter(self.test_labels, test_predictions, alpha=0.5)
-            plt.xlabel('True values (expenses)')
-            plt.ylabel('Predictions (expenses)')
-            lims = [0, 50000]
-            plt.xlim(lims)
-            plt.ylim(lims)
-            plt.plot(lims, lims, 'r--')
-            plt.gca().set_aspect('equal', adjustable='box')
-            plt.title('Predicted vs Actual Healthcare Costs')
-            plt.show()
-        except Exception as e:
-            raise RuntimeError(f"Failed to visualize results: {e}")
-
-    def run(self):
-        """Run the full pipeline."""
-        try:
-            self.load_data()
-            self.preprocess_data()
-            self.build_model()
-            self.train_model()
-            self.evaluate_model()
-            self.visualize_results()
-        except Exception as e:
-            print(f"Pipeline failed: {e}")
-
+        print("You passed the challenge. Great job!" if passed else "You haven't passed yet. Keep trying.")
 
 if __name__ == "__main__":
-    url = 'https://cdn.freecodecamp.org/project-data/health-costs/insurance.csv'
-    predictor = HealthCostPredictor(url)
-    predictor.run()
+    classifier = SMSTextClassifier()
+    classifier.download_data()
+    classifier.load_and_preprocess_data()
+    classifier.build_model()
+    classifier.train_model()
+    print(classifier.predict_message("how are you doing today"))
+    classifier.test_predictions()

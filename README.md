@@ -1,6 +1,6 @@
-# Healthcare Costs Prediction using TensorFlow Linear Regression
+# SMS Text Classifier using TensorFlow Sequential Neural Network
 
-This project implements a healthcare costs prediction system using a Linear Regression model in TensorFlow, developed as part of the freeCodeCamp Machine Learning with Python certification. The goal is to predict healthcare expenses based on features like age, sex, BMI, children, smoker status, and region, achieving a Mean Absolute Error (MAE) under $3500 on the test dataset, using the insurance dataset.
+This project implements an SMS text classification system using a Sequential Neural Network with Embedding and Dense Layers in TensorFlow, developed as part of the freeCodeCamp Machine Learning with Python certification. The goal is to classify SMS messages as either "ham" (normal messages) or "spam" (advertisements or company messages) using the SMS Spam Collection dataset.
 
 ---
 
@@ -11,36 +11,44 @@ This project implements a healthcare costs prediction system using a Linear Regr
 
 ---
 
-### Project Overview
+## Project Overview
 The project involves:
-1. Loading and preprocessing the insurance dataset, encoding categorical variables (sex, smoker, region), and normalizing numerical features.
-2. Splitting the dataset into 80% training and 20% testing sets, with the target variable (`expenses`) separated as labels.
-3. Building a Linear Regression model using TensorFlow’s `Sequential` API with a single dense layer.
-4. Training the model to minimize MAE and evaluating it to ensure MAE < 3500 on the test set.
-5. Visualizing predicted vs. actual expenses using a scatter plot.
-6. Implementing the logic in a modular, class-based Python script (`HealthcareCostsPredictor.py`) for reusability.
+1. Loading and preprocessing the SMS Spam Collection dataset, converting text messages into padded sequences and labels into binary (0 for ham, 1 for spam).
+2. Building a **Sequential Neural Network** using TensorFlow’s `Sequential` API, featuring:
+   - An **Embedding Layer** (16 dimensions) to convert tokenized words into dense vectors.
+   - A **GlobalAveragePooling1D** layer to aggregate embeddings.
+   - A **Dense Layer** with 24 units and ReLU activation for pattern learning.
+   - A **Dense Output Layer** with 1 unit and Sigmoid activation for binary classification.
+3. Training the model with binary cross-entropy loss and Adam optimizer to classify messages as "ham" or "spam" with high accuracy.
+4. Implementing a `predict_message` function that takes a message string and returns a list containing the probability of "spam" (0 to 1) and the predicted label ("ham" or "spam").
+5. Testing the model against a set of predefined messages to ensure correct classification.
+6. Providing a modular Python class (`SMSTextClassifier.py`) for reusability.
 
-Example output from the evaluation:
+Example output from the prediction function:
+```python
+[0.008318834938108921, 'ham']
+```
+
+Example test result:
 ```bash
-Testing set Mean Abs Error: 2456.78 expenses
 You passed the challenge. Great job!
 ```
-(A scatter plot shows predicted vs. actual expenses with a 1:1 reference line.)
 
 ---
 
-### [Google Colab Project Link](https://colab.research.google.com/drive/1YhqiUuH22rZCzQpfbL8msT8cHZ4J_uGR#scrollTo=Xe7RXH3N3CWU)
+## [Google Colab Project Link](https://colab.research.google.com/drive/1XF7scLFr_brcQARJEf5CiS3lxFcaSSrr#scrollTo=8RZOuS9LWQvv)
 
 ---
 
 ## 🛠 Tech Stack
 * Language: Python 3.10+
 * Libraries:
-  * TensorFlow (for Linear Regression model with `Sequential` API)
-  * Pandas (for data preprocessing and manipulation)
+  * TensorFlow (for building a Sequential Neural Network with Embedding, GlobalAveragePooling1D, and Dense Layers)
+  * Pandas (for data loading and preprocessing)
   * NumPy (for numerical operations)
-  * Scikit-learn (for `LabelEncoder`, `StandardScaler`, and `train_test_split`)
-  * Matplotlib (for visualization)
+  * TensorFlow-Datasets (optional, for compatibility)
+  * Scikit-learn (for `train_test_split`)
+  * Requests (for downloading datasets in Python script)
 * Tools:
   * Google Colab for development, training, and testing (with GPU support)
   * GitHub for version control
@@ -49,52 +57,53 @@ You passed the challenge. Great job!
 
 ## 📂 Project Structure
 The project includes:
-* `HealthcareCostsPredictor.py`: A class-based Python script with methods for loading, preprocessing, building, training, evaluating, and visualizing the model.
-* `insurance.csv`: The dataset (downloaded automatically from [https://cdn.freecodecamp.org/project-data/health-costs/insurance.csv](https://cdn.freecodecamp.org/project-data/health-costs/insurance.csv)).
-* Colab Notebook (optional): A four-cell notebook implementing the same logic sequentially (import libraries, load data, preprocess/train, evaluate/visualize).
+* `SMSTextClassifier.py`: A class-based Python script with methods for downloading, preprocessing, building, training, and testing the Sequential Neural Network model.
+* `AliTori_sms_text_classification.ipynb`: Colab notebook implementing the logic in five cells (import libraries, load data, preprocess/train, define prediction function, test predictions).
+* `train-data.tsv`: Training dataset (downloaded from [https://cdn.freecodecamp.org/project-data/sms/train-data.tsv](https://cdn.freecodecamp.org/project-data/sms/train-data.tsv)).
+* `valid-data.tsv`: Test dataset (downloaded from [https://cdn.freecodecamp.org/project-data/sms/valid-data.tsv](https://cdn.freecodecamp.org/project-data/sms/valid-data.tsv)).
 * `README.md`: This file.
 
 Dataset structure:
 ```bash
-insurance.csv: Contains features (age, sex, bmi, children, smoker, region) and target (expenses)
+train-data.tsv: Contains columns [label (ham/spam), message]
+valid-data.tsv: Contains columns [label (ham/spam), message]
 ```
 
 ---
 
 ## Usage
 ### Python Script
-1. Save `HealthcareCostsPredictor.py` locally.
+1. Save `SMSTextClassifier.py` locally.
 2. Install required libraries:
    ```bash
-   pip install pandas numpy tensorflow scikit-learn matplotlib
+   pip install tensorflow pandas numpy scikit-learn requests
    ```
 3. Run the script:
    ```bash
-   python HealthcareCostsPredictor.py
+   python SMSTextClassifier.py
    ```
 4. The script will:
-   - Download the dataset if not already present
-   - Preprocess data (encode categorical variables, normalize features, split into 80% train/20% test)
-   - Build and train a TensorFlow Linear Regression model
-   - Evaluate the model (prints MAE, typically ~2000-2500)
-   - Display a scatter plot of predicted vs. actual expenses
+   - Download the datasets if not present
+   - Preprocess data, train the Sequential Neural Network, and test predictions
+   - Output the prediction for a sample message and the test results
 
-### Colab Notebook (Optional)
-1. Open the Colab notebook: [Link to your notebook, e.g., https://colab.research.google.com/drive/1YhqiUuH22rZCzQpfbL8msT8cHZ4J_uGR]
+### Colab Notebook
+1. Open the Colab notebook: [Google Colab Project Link](https://colab.research.google.com/drive/1XF7scLFr_brcQARJEf5CiS3lxFcaSSrr#scrollTo=8RZOuS9LWQvv)
 2. Save a copy to your Google Drive (**File > Save a copy in Drive**).
 3. Enable GPU for faster training (**Runtime > Change runtime type > GPU**).
 4. Run all cells sequentially:
-   - Cell 1: Import libraries and install tensorflow-docs
-   - Cell 2: Load the dataset
-   - Cell 3: Preprocess data and train the model
-   - Cell 4: Evaluate the model and visualize results
+   - Cell 1: Import libraries and install `tensorflow` and `tensorflow-datasets`
+   - Cell 2: Download and load the datasets
+   - Cell 3: Preprocess data, build and train the Sequential Neural Network
+   - Cell 4: Define `predict_message` function
+   - Cell 5: Test the model with predefined messages
 5. Ensure the notebook’s sharing settings are “anyone with the link” for submission.
 
 ---
 
 ## Contributing
 Contributions are welcome! To contribute:
-1. Fork the repository: [https://github.com/AliToori/Healthcare-Costs-Prediction](https://github.com/AliToori/Healthcare-Costs-Prediction)
+1. Fork the repository: [https://github.com/AliToori/SMS-Text-Classifier](https://github.com/AliToori/SMS-Text-Classifier)
 2. Create a feature branch (`git checkout -b feature-name`).
 3. Commit changes (`git commit -m "Add feature"`).
 4. Push to the branch (`git push origin feature-name`).
@@ -105,12 +114,11 @@ Alternatively, share an updated Colab notebook link via GitHub issues or Telegra
 
 ## 🙏 Acknowledgments
 - Built as part of the [freeCodeCamp Machine Learning with Python](https://www.freecodecamp.org/learn/machine-learning-with-python) certification.
-- Uses TensorFlow for model development and Google Colab for cloud-based execution.
+- Uses TensorFlow for developing a Sequential Neural Network with Embedding and Dense Layers, and Google Colab for cloud-based execution.
 - Special thanks to freeCodeCamp for providing the challenge framework and dataset.
 
 ## 🆘 Support
 For questions, issues, or feedback:  
-
 📺 YouTube: [@AliToori](https://youtube.com/@AliToori)  
 💬 Telegram: [@AliToori](https://t.me/@AliToori)  
 📂 GitHub: [github.com/AliToori](https://github.com/AliToori)
