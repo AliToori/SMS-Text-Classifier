@@ -57,14 +57,16 @@ You passed the challenge. Great job!
 
 ## 📂 Project Structure
 The project includes:
-* `HealthcareCostsPredictor.py`: A class-based Python script with methods for loading, preprocessing, building, training, evaluating, and visualizing the model.
-* `insurance.csv`: The dataset (downloaded automatically from [https://cdn.freecodecamp.org/project-data/health-costs/insurance.csv](https://cdn.freecodecamp.org/project-data/health-costs/insurance.csv)).
-* Colab Notebook (optional): A four-cell notebook implementing the same logic sequentially (import libraries, load data, preprocess/train, evaluate/visualize).
+* `SMSTextClassifier.py`: A class-based Python script with methods for downloading, preprocessing, building, training, and testing the Sequential Neural Network model.
+* `AliTori_sms_text_classification.ipynb`: Colab notebook implementing the logic in five cells (import libraries, load data, preprocess/train, define prediction function, test predictions).
+* `train-data.tsv`: Training dataset (downloaded from [https://cdn.freecodecamp.org/project-data/sms/train-data.tsv](https://cdn.freecodecamp.org/project-data/sms/train-data.tsv)).
+* `valid-data.tsv`: Test dataset (downloaded from [https://cdn.freecodecamp.org/project-data/sms/valid-data.tsv](https://cdn.freecodecamp.org/project-data/sms/valid-data.tsv)).
 * `README.md`: This file.
 
 Dataset structure:
 ```bash
-insurance.csv: Contains features (age, sex, bmi, children, smoker, region) and target (expenses)
+train-data.tsv: Contains columns [label (ham/spam), message]
+valid-data.tsv: Contains columns [label (ham/spam), message]
 ```
 
 ---
