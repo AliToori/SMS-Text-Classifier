@@ -43,11 +43,12 @@ You passed the challenge. Great job!
 ## 🛠 Tech Stack
 * Language: Python 3.10+
 * Libraries:
-  * TensorFlow (for Linear Regression model with `Sequential` API)
-  * Pandas (for data preprocessing and manipulation)
+  * TensorFlow (for building a Sequential Neural Network with Embedding, GlobalAveragePooling1D, and Dense Layers)
+  * Pandas (for data loading and preprocessing)
   * NumPy (for numerical operations)
-  * Scikit-learn (for `LabelEncoder`, `StandardScaler`, and `train_test_split`)
-  * Matplotlib (for visualization)
+  * TensorFlow-Datasets (optional, for compatibility)
+  * Scikit-learn (for `train_test_split`)
+  * Requests (for downloading datasets in Python script)
 * Tools:
   * Google Colab for development, training, and testing (with GPU support)
   * GitHub for version control
@@ -56,35 +57,35 @@ You passed the challenge. Great job!
 
 ## 📂 Project Structure
 The project includes:
-* `HealthcareCostsPredictor.py`: A class-based Python script with methods for loading, preprocessing, building, training, evaluating, and visualizing the model.
-* `insurance.csv`: The dataset (downloaded automatically from [https://cdn.freecodecamp.org/project-data/health-costs/insurance.csv](https://cdn.freecodecamp.org/project-data/health-costs/insurance.csv)).
-* Colab Notebook (optional): A four-cell notebook implementing the same logic sequentially (import libraries, load data, preprocess/train, evaluate/visualize).
+* `SMSTextClassifier.py`: A class-based Python script with methods for downloading, preprocessing, building, training, and testing the Sequential Neural Network model.
+* `AliTori_sms_text_classification.ipynb`: Colab notebook implementing the logic in five cells (import libraries, load data, preprocess/train, define prediction function, test predictions).
+* `train-data.tsv`: Training dataset (downloaded from [https://cdn.freecodecamp.org/project-data/sms/train-data.tsv](https://cdn.freecodecamp.org/project-data/sms/train-data.tsv)).
+* `valid-data.tsv`: Test dataset (downloaded from [https://cdn.freecodecamp.org/project-data/sms/valid-data.tsv](https://cdn.freecodecamp.org/project-data/sms/valid-data.tsv)).
 * `README.md`: This file.
 
 Dataset structure:
 ```bash
-insurance.csv: Contains features (age, sex, bmi, children, smoker, region) and target (expenses)
+train-data.tsv: Contains columns [label (ham/spam), message]
+valid-data.tsv: Contains columns [label (ham/spam), message]
 ```
 
 ---
 
 ## Usage
 ### Python Script
-1. Save `HealthcareCostsPredictor.py` locally.
+1. Save `SMSTextClassifier.py` locally.
 2. Install required libraries:
    ```bash
-   pip install pandas numpy tensorflow scikit-learn matplotlib
+   pip install tensorflow pandas numpy scikit-learn requests
    ```
 3. Run the script:
    ```bash
-   python HealthcareCostsPredictor.py
+   python SMSTextClassifier.py
    ```
 4. The script will:
-   - Download the dataset if not already present
-   - Preprocess data (encode categorical variables, normalize features, split into 80% train/20% test)
-   - Build and train a TensorFlow Linear Regression model
-   - Evaluate the model (prints MAE, typically ~2000-2500)
-   - Display a scatter plot of predicted vs. actual expenses
+   - Download the datasets if not present
+   - Preprocess data, train the Sequential Neural Network, and test predictions
+   - Output the prediction for a sample message and the test results
 
 ### Colab Notebook (Optional)
 1. Open the Colab notebook: [Link to your notebook, e.g., https://colab.research.google.com/drive/1YhqiUuH22rZCzQpfbL8msT8cHZ4J_uGR]
