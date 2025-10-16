@@ -103,7 +103,7 @@ valid-data.tsv: Contains columns [label (ham/spam), message]
 
 ## Contributing
 Contributions are welcome! To contribute:
-1. Fork the repository: [https://github.com/AliToori/Healthcare-Costs-Prediction](https://github.com/AliToori/Healthcare-Costs-Prediction)
+1. Fork the repository: [https://github.com/AliToori/SMS-Text-Classifier](https://github.com/AliToori/SMS-Text-Classifier)
 2. Create a feature branch (`git checkout -b feature-name`).
 3. Commit changes (`git commit -m "Add feature"`).
 4. Push to the branch (`git push origin feature-name`).
@@ -114,12 +114,11 @@ Alternatively, share an updated Colab notebook link via GitHub issues or Telegra
 
 ## 🙏 Acknowledgments
 - Built as part of the [freeCodeCamp Machine Learning with Python](https://www.freecodecamp.org/learn/machine-learning-with-python) certification.
-- Uses TensorFlow for model development and Google Colab for cloud-based execution.
+- Uses TensorFlow for developing a Sequential Neural Network with Embedding and Dense Layers, and Google Colab for cloud-based execution.
 - Special thanks to freeCodeCamp for providing the challenge framework and dataset.
 
 ## 🆘 Support
 For questions, issues, or feedback:  
-
 📺 YouTube: [@AliToori](https://youtube.com/@AliToori)  
 💬 Telegram: [@AliToori](https://t.me/@AliToori)  
 📂 GitHub: [github.com/AliToori](https://github.com/AliToori)
